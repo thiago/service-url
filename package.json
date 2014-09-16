@@ -1,6 +1,6 @@
 {
   "name": "service-url",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "organize urls services generically",
   "main": "index.js",
   "scripts": {

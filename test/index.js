@@ -91,22 +91,18 @@ describe('Methods', function () {
 describe('Request tests', function () {
 
   it('basic test get', function (done) {
-    route.get(function(data){
-      //route.should.to.have.property('resource').and.to.be.a('function');
+    route.get().then(function(data){
       done();
     }, function(data){
-      //route.should.to.have.property('resource').and.to.be.a('function');
       done();
     });
   });
 
   it('basic test data', function (done) {
-    route.data(function(result){
+    route.data().then(function(result){
       expect(result.data).to.contain('<a href="2014/">2014/</a>');
       done();
     }, function(result){
-      console.log('entrou ERROR');
-      //route.should.to.have.property('resource').and.to.be.a('function');
       done();
     });
   });

@@ -120,14 +120,14 @@
         'remove': {method: 'DELETE'},
         'delete': {method: 'DELETE'}
       }
-    }, providerDefaults);
+    }, providerDefaults || {});
 
-    this.sync = function (config, success, error) {
+    this.sync = function (config) {
       if (config.params && !config.query) {
         config.query = config.params;
         delete config.params;
       }
-      return rest.request(config.url, config).then(success || noop, error || noop);
+      return rest.request(config.url, config);
     };
 
     function Route(template, defaults) {
@@ -216,52 +216,13 @@
         return ids;
       }
 
-      function processMethod(c1, c2, a1, a2, a3, a4) {
+      function processMethod(c1, c2, a1, a2, a3) {
         var args = Array.prototype.slice.call(arguments),
           hasBody = args.shift(),
           action = args.shift(),
-          params = {}, data, success, error;
+          params = a1 || {}, data = a2 || {}, options = a3 || {};
 
-        /* jshint -W086 */
-        /* (purposefully fall through case statements) */
-        switch (args.length) {
-          case 4:
-            error = a4;
-            success = a3;
-          //fallthrough
-          case 3:
-          case 2:
-            if (isFunction(a2)) {
-              if (isFunction(a1)) {
-                success = a1;
-                error = a2;
-                break;
-              }
-
-              success = a2;
-              error = a3;
-              //fallthrough
-            } else {
-              params = a1;
-              data = a2;
-              success = a3;
-              break;
-            }
-          case 1:
-            if (isFunction(a1)) success = a1;
-            else if (hasBody) data = a1;
-            else params = a1;
-            break;
-          case 0:
-            break;
-          default:
-            throw minErr('badargs',
-              "Expected up to 4 arguments [params, data, success, error], got " + args.length + " arguments");
-        }
-        /* jshint +W086 */
-        /* (purposefully fall through case statements) */
-
-        var httpConfig = {};
+        var httpConfig = extend({}, options);
 
         forEach(action, function (value, key) {
           if (key != 'params' && key != 'interceptor') {
@@ -274,7 +235,7 @@
           extend({}, extractParams(data, action.params || {}), params),
           action.url);
 
-        return {config: httpConfig, success: success, error: error};
+        return httpConfig;
       }
 
       function Resource(value) {
@@ -282,23 +243,18 @@
       }
 
       Resource.getConfig = function (a1, a2, a3, a4) {
-        var action = a1, params = a2, data = a3, callback = a4, config;
+        var action = a1, params = a2, data = a3, options = a4;
         if (typeof a1 !== 'string') {
           action = {};
           params = a1;
           data = a2;
-          callback = a3;
+          options = a3;
         } else if (actions.hasOwnProperty(a1)) {
           action = actions[a1];
         } else {
           action = {};
         }
-        config = processMethod(false, action, params, data).config;
-
-        if (typeof callback === 'function') {
-          callback(config);
-        }
-        return config;
+        return processMethod(false, action, params, data, options);
       };
 
       Resource.getUrl = function () {
@@ -320,9 +276,8 @@
 
       forEach(actions, function (action, name) {
         var hasBody = /^(POST|PUT|PATCH)$/i.test(action.method);
-        Resource[name] = function (a1, a2, a3, a4) {
-          var allConfig = processMethod(hasBody, action, a1, a2, a3, a4);
-          return provider.sync(allConfig.config, allConfig.success, allConfig.error);
+        Resource[name] = function (a1, a2, a3) {
+          return provider.sync(processMethod(hasBody, action, a1, a2, a3));
         };
       });
 

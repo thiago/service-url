@@ -15,5 +15,26 @@ $ npm install service-url
 ## Example Usage
 
 ``` js
-var serviceUrl = require('service-url');
+var serviceUrl = new require('service-url')();
+var route = serviceUrl.resource('http://posttestserver.com/:path:format', {
+    path: 'post',
+    format: '.php',
+    dir: 'nodejs/service-url/'
+  },{
+    'get': {
+      method: 'GET',
+      params: {
+        path: 'data',
+        format: null,
+        dir: null
+      }
+    }
+  });
+
+route.get().then(function(result){
+    console.log(result.data);
+}, function(result){
+    console.log(result.data);
+});
+
 ```
