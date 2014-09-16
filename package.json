@@ -4,19 +4,28 @@
   "description": "organize urls services generically",
   "main": "index.js",
   "scripts": {
-    "test": "node_modules/.bin/grunt ci"
+    "test": "grunt ci"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/trsouz/service-url"
   },
-  "keywords": ["rest","restling","service","url","request"],
+  "keywords": [
+    "rest",
+    "restling",
+    "service",
+    "url",
+    "request"
+  ],
   "author": "Thiago Rodrigues <thiagorsouz@gmail.com> (http://trsweb.com.br)",
   "license": "BSD-3-Clause",
   "bugs": {
     "url": "https://github.com/trsouz/service-url/issues"
   },
-  "dependencies": {},
+  "dependencies": {
+    "lodash": "~2.4.1",
+    "restling": "~0.6.4"
+  },
   "devDependencies": {
     "chai": "~1.8.1",
     "grunt-contrib-jshint": "~0.6.4",
